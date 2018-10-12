@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: http-svc-ingress
-  namespaces: test
+  namespace: test
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
