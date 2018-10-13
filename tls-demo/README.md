@@ -117,6 +117,47 @@ I1013 07:21:12.869274       6 backend_ssl.go:181] updating local copy of ssl cer
 I1013 07:21:12.869409       6 controller.go:168] backend reload required
 I1013 07:21:12.937191       6 controller.go:177] ingress backend successfully reloaded...
 ```
+##### 直接进入 nginx-ingress-controller 查看nginx配置文件
+```
+# kubectl exec -it nginx-ingress-controller-6659966c64-vqj6g -- /bin/sh
+# cd /etc/nginx
+# cat nginx.conf
+...
+...
+	upstream ingress-tls-demo-webapp-tls-demo-80 {
+		least_conn;
+		
+		keepalive 32;
+		
+		server 10.244.1.11:80 max_fails=0 fail_timeout=0;
+		server 10.244.1.10:80 max_fails=0 fail_timeout=0;
+		server 10.244.1.12:80 max_fails=0 fail_timeout=0;
+		
+	}
+  ...
+  ...
+  server {
+		server_name che.webserver.com ;
+		
+		listen 80;
+		
+		listen [::]:80;
+		
+		set $proxy_upstream_name "-";
+		
+		listen 443  ssl http2;
+		
+		listen [::]:443  ssl http2;
+		
+		# PEM sha: 606360b01e13d7ec05bac458a53f4eb64bdd2a44
+		ssl_certificate                         /ingress-controller/ssl/ingress-tls-demo-webserver-tls-secret.pem;
+		ssl_certificate_key                     /ingress-controller/ssl/ingress-tls-demo-webserver-tls-secret.pem;
+		
+		ssl_trusted_certificate                 /ingress-controller/ssl/ingress-tls-demo-webserver-tls-secret-full-chain.pem;
+		ssl_stapling                            on;
+		ssl_stapling_verify                     on;
+
+```
 
 #### 7、浏览器访问服务,记得修改hosts
 ##### https://che.webserver.com:30443
