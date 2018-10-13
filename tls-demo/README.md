@@ -117,3 +117,6 @@ I1013 07:21:12.869274       6 backend_ssl.go:181] updating local copy of ssl cer
 I1013 07:21:12.869409       6 controller.go:168] backend reload required
 I1013 07:21:12.937191       6 controller.go:177] ingress backend successfully reloaded...
 ```
+
+#### 7、浏览器访问服务,记得修改hosts
+##### https://che.webserver.com:30443
