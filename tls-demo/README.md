@@ -22,3 +22,16 @@ total 16
 -rw-r--r-- 1 root root 1302 Oct 13 15:03 tls.crt
 -rw------- 1 root root 1679 Oct 13 15:00 tls.key
 ```
+
+#### 3、生成tls类型的secret
+##### The resulting secret will be of type kubernetes.io/tls
+```
+[root@k8s-node1 tls-demo]# kubectl create secret tls webserver-tls-secret --cert=tls.crt --key=tls.key 
+secret/webserver-tls-secret created
+[root@k8s-node1 tls-demo]# 
+[root@k8s-node1 tls-demo]# kubectl get secrets 
+NAME                                       TYPE                                  DATA   AGE
+default-token-8s7d2                        kubernetes.io/service-account-token   3      16h
+nginx-ingress-serviceaccount-token-n5nk6   kubernetes.io/service-account-token   3      16h
+webserver-tls-secret                       kubernetes.io/tls                     2      8s
+```
