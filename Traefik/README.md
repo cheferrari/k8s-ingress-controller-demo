@@ -43,3 +43,5 @@ spec:
           servicePort: 80
         path: /
 ```
+Traefik的canary实现是通过在同一路径下（如 path: /）指定两个后端服务（每个服务代表的版本不一样），然后设置每个服务的权重，从而是每个服务获取的流量不同，达到金丝雀发布的效果。  
+这跟 kubernetes 原生的 canary deployment 是由区别的，原生的是在同一服务Service后边通过Pod标签挑选出具有相同标签的 两个不同版本的的deployment来实现，流量分发完全是通过每个deployment的副本数来控制，如版本1的deployment副本数是10，较新的版本2的deployment副本数是5，那么新版本就会获取1/3的流量。  参考：https://github.com/cheferrari/k8s-demo/tree/master/canary-deployment
