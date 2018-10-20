@@ -1,0 +1,117 @@
+[root@k8s-node1 traefik]# cat canary-test.yaml 
+apiVersion: v1
+kind: Namespace
+metadata:
+ name: traefik-demo
+########################################
+## Service: my-app
+########################################
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app
+  namespace: traefik-demo
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: my-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-v1
+  namespace: traefik-demo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-app
+      version: my-app-version-1
+      track: stable
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: my-app-version-1
+        track: stable
+    spec:
+      containers:
+      - name: my-app-version-1
+        image: ferrariche/myweb:v1
+        resources:
+          requests:
+            cpu: 0.1
+            memory: 100
+########################################
+# Service: my-app-canary
+#######################################
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-canary
+  namespace: traefik-demo
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: my-app-canary
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-v2
+  namespace: traefik-demo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-app-canary
+      version: my-app-version-2
+      track: canary
+  template:
+    metadata:
+      labels:
+        app: my-app-canary
+        version: my-app-version-2
+        track: canary
+    spec:
+      containers:
+      - name: my-app-version-2
+        image: ferrariche/myweb:v2
+        resources:
+          requests:
+            cpu: 0.1
+            memory: 100
+########################################
+## Ingress: my-app
+########################################
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/service-weights: |
+      my-app: 80%
+      my-app-canary: 20%
+  name: my-app
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: my-app
+          servicePort: 80
+        path: /
+      - backend:
+          serviceName: my-app-canary
+          servicePort: 80
+        path: /
