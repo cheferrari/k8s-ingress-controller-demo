@@ -45,3 +45,62 @@ spec:
 ```
 Traefik的canary实现是通过在同一路径下（如 path: /）指定两个后端服务（每个服务代表的版本不一样），然后设置每个服务的权重，从而是每个服务获取的流量不同，达到金丝雀发布的效果。  
 这跟 kubernetes 原生的 canary deployment 是由区别的，原生的是在同一服务Service后边通过Pod标签挑选出具有相同标签的 两个不同版本的的deployment来实现，流量分发完全是通过每个deployment的副本数来控制，如版本1的deployment副本数是10，较新的版本2的deployment副本数是5，那么新版本就会获取1/3的流量。  参考：https://github.com/cheferrari/k8s-demo/tree/master/canary-deployment
+```
+[root@k8s-node1 ~]# kubectl get svc
+NAME            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+cheddar         ClusterIP   10.104.37.200    <none>        80/TCP    3d3h
+my-app          ClusterIP   10.96.57.127     <none>        80/TCP    22h
+my-app-canary   ClusterIP   10.106.36.190    <none>        80/TCP    21h
+stilton         ClusterIP   10.107.104.196   <none>        80/TCP    3d3h
+wensleydale     ClusterIP   10.103.39.190    <none>        80/TCP    3d3h
+[root@k8s-node1 ~]# kubectl get pod --show-labels |grep web
+web-v1-56db97cfd-vpjnw         1/1     Running   1          22h    app=my-app,pod-template-hash=56db97cfd,track=stable,version=my-app-version-1
+web-v1-56db97cfd-wl65c         1/1     Running   1          22h    app=my-app,pod-template-hash=56db97cfd,track=stable,version=my-app-version-1
+web-v2-54c65655f-c49bz         1/1     Running   1          22h    app=my-app-canary,pod-template-hash=54c65655f,track=canary,version=my-app-version-2
+web-v2-54c65655f-mp2m9         1/1     Running   1          22h    app=my-app-canary,pod-template-hash=54c65655f,track=canary,version=my-app-version-2
+[root@k8s-node1 istio-canary]# while true; do curl http://192.168.75.152:30820/; sleep 1; done
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v2!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v2!</h1>
+<h1>My websever Version: v2!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v2!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v2!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v2!</h1>
+<h1>My websever Version: v2!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v2!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+<h1>My websever Version: v1!</h1>
+```
