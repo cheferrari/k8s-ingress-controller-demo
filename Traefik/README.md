@@ -108,4 +108,4 @@ web-v2-54c65655f-mp2m9         1/1     Running   1          22h    app=my-app-ca
 <h1>My websever Version: v1!</h1>
 <h1>My websever Version: v1!</h1>
 ```
-前20个访问中，stable：v1版本响应了16个，canary：v2版本响应了4个，正好v1版本的流占到30%，canary版本占到20%
+前20个访问中，stable：v1版本响应了16个，canary：v2版本响应了4个，正好v1-stable版本的流占到80%，v2-canary版本占到20%
