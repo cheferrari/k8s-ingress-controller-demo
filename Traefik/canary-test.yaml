@@ -45,8 +45,8 @@ spec:
         image: ferrariche/myweb:v1
         resources:
           requests:
-            cpu: 0.1
-            memory: 100
+            cpu: 20m
+            memory: 20Mi
 ########################################
 # Service: my-app-canary
 #######################################
@@ -89,8 +89,8 @@ spec:
         image: ferrariche/myweb:v2
         resources:
           requests:
-            cpu: 0.1
-            memory: 100
+            cpu: 20m
+            memory: 20Mi
 ########################################
 ## Ingress: my-app
 ########################################
