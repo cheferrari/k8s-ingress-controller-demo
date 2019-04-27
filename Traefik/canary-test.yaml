@@ -103,6 +103,7 @@ metadata:
       my-app: 80%
       my-app-canary: 20%
   name: my-app
+  namespace: traefik-demo
 spec:
   rules:
   - http:
